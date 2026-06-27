@@ -17,11 +17,11 @@
 }
 .top-banner {
   width: 200%;
-  line-height: 0;
+  line-height: 20;
 }
 
 .top-banner img {
-  width: 100%;
+  width: 200%;
   height: auto;
   display: block;
 }
