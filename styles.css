@@ -16,12 +16,12 @@
   --radius-sm: 8px;
 }
 .top-banner {
-  width: 100%;
-  line-height: 30;
+  width: 90%;
+  line-height: 0;
 }
 
 .top-banner img {
-  width: 100%;
+  width: 90%;
   height: auto;
   display: block;
 }
