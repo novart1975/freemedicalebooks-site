@@ -15,6 +15,16 @@
   --radius: 12px;
   --radius-sm: 8px;
 }
+.top-banner {
+  width: 100%;
+  line-height: 0;
+}
+
+.top-banner img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 
 * { box-sizing: border-box; }
 
