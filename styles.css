@@ -16,19 +16,14 @@
   --radius-sm: 8px;
 }
 .top-banner {
-  width: 200%;
-  display: flex;
-  justify-content: center;
-  padding: 64px 56px;
+  width: 100%;
+  line-height: 0;
 }
 
 .top-banner img {
-  max-width: 1250px;
   width: 100%;
   height: auto;
   display: block;
-  border-radius: var(--radius);
-  box-shadow: 0 0 0 1px var(--border);
 }
 
 * { box-sizing: border-box; }
