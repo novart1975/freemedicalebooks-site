@@ -16,14 +16,14 @@
   --radius-sm: 8px;
 }
 .top-banner {
-  width: 100%;
+  width: 200%;
   display: flex;
   justify-content: center;
   padding: 64px 56px;
 }
 
 .top-banner img {
-  max-width: 1050px;
+  max-width: 1250px;
   width: 100%;
   height: auto;
   display: block;
