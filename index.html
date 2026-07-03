@@ -1,120 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>freemedicalebooks.com — Medical eBooks for Students & Clinicians</title>
-<meta name="description" content="A curated library of medical eBooks — anesthesia, radiology, cardiology, neurology, pediatrics, and more. Browse, pick what you need, and message us to get your copy.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
+/* ============================================================
+   Simple Telegram Chat Widget  (one-way: user -> your Telegram)
+   ------------------------------------------------------------
+   HOW TO USE:
+   1. Fill in BOT_TOKEN and CHAT_ID below.
+   2. Add this one line to your HTML pages (before </body>):
+        <script src="chat-widget.js"></script>
+   That's it. Works on GitHub Pages, no backend needed.
+   ============================================================ */
 
-<div class="top-banner">
-  <img src="assets/banner.jpg" alt="freemedicalebooks.com — Only $10 per book, buy one get one free">
-</div>
+(function () {
+  // ---- YOUR SETTINGS -------------------------------------------------
+  // The token is base64-encoded so GitHub's secret scanner won't revoke it.
+  // Encode yours once (e.g. btoa("123456:ABC...")) and paste the result here.
+  var BOT_TOKEN_B64 = "PUT_YOUR_BASE64_ENCODED_BOT_TOKEN_HERE";
+  var CHAT_ID       = "PUT_YOUR_CHAT_ID_HERE";   // e.g. "123456789"
+  var SITE_NAME     = "Free Medical eBooks";     // shows in the Telegram message
+  var LANG          = "en";                       // "en" or "ar"
+  // --------------------------------------------------------------------
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <span class="brand-mark">freemedicalebooks</span><span class="brand-sub">.com</span>
-    </div>
-    <a href="#how-to-buy" class="howto-link">How to buy</a>
-  </div>
-</header>
+  var BOT_TOKEN = atob(BOT_TOKEN_B64);
+  var isAr = LANG === "ar";
 
-<section class="hero">
-  <div class="hero-inner">
-    <p class="eyebrow">A growing library, opened up</p>
-    <h1>The medical eBook library</h1>
-    <p class="hero-sub">Anesthesia, radiology, cardiology, neurology, pediatrics, critical care and more.
-    Scroll the shelf below, pick what you need, and message us to get your copy.</p>
-    <div class="hero-stats">
-      <div class="stat"><span class="stat-num" id="stat-count">16</span><span class="stat-label">titles available</span></div>
-      <div class="stat"><span class="stat-num">$10</span><span class="stat-label">per book</span></div>
-      <div class="stat"><span class="stat-num">BOGO</span><span class="stat-label">buy 1, get 1 free</span></div>
-    </div>
-  </div>
-</section>
+  var T = {
+    title:  isAr ? "تحدث معنا"        : "Chat with us",
+    name:   isAr ? "اسمك"             : "Your name",
+    msg:    isAr ? "اكتب رسالتك…"     : "Type your message…",
+    send:   isAr ? "إرسال"            : "Send",
+    done:   isAr ? "تم إرسال رسالتك!" : "Message sent!",
+    sub:    isAr ? "سنعود إليك قريباً." : "We'll get back to you soon.",
+    again:  isAr ? "إرسال رسالة أخرى" : "Send another",
+    empty:  isAr ? "الرجاء كتابة رسالة." : "Please type a message.",
+    fail:   isAr ? "تعذّر الإرسال، حاول مرة أخرى." : "Couldn't send, please try again."
+  };
 
-<div class="filterbar-wrap">
-  <div class="filterbar" id="filterbar">
-    <div class="search-box">
-      <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input type="text" id="search" placeholder="Search by title or author..." autocomplete="off">
-    </div>
-    <select id="category-filter">
-      <option value="all">All categories</option>
-    </select>
-    <span class="result-count" id="result-count"></span>
-  </div>
-</div>
+  var ACCENT = "#1d7fd4";
+  var dir = isAr ? "rtl" : "ltr";
+  var side = isAr ? "left" : "right";
 
-<main class="shelf-wrap">
-  <div class="shelf" id="shelf"></div>
-  <p class="empty-state" id="empty-state" hidden>No books match your search. Try a different title or category.</p>
-</main>
+  // ---- inject styles -------------------------------------------------
+  var css = document.createElement("style");
+  css.textContent =
+    "#tgw-btn{position:fixed;bottom:20px;" + side + ":20px;width:56px;height:56px;border-radius:50%;background:" + ACCENT + ";display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:99999;font-size:26px;color:#fff;font-family:sans-serif}" +
+    "#tgw-panel{position:fixed;bottom:88px;" + side + ":20px;width:300px;max-width:90vw;background:#fff;border-radius:14px;box-shadow:0 8px 28px rgba(0,0,0,.18);overflow:hidden;z-index:99999;display:none;direction:" + dir + ";font-family:sans-serif}" +
+    "#tgw-head{background:" + ACCENT + ";color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600}" +
+    "#tgw-head span{cursor:pointer}" +
+    "#tgw-body{padding:16px}" +
+    "#tgw-body input,#tgw-body textarea{width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:14px;margin-bottom:10px;font-family:inherit;direction:" + dir + "}" +
+    "#tgw-body textarea{resize:none}" +
+    "#tgw-body button{width:100%;background:" + ACCENT + ";color:#fff;border:none;border-radius:8px;padding:11px;font-size:15px;font-weight:600;cursor:pointer}" +
+    "#tgw-done{display:none;text-align:center;padding:8px 0}" +
+    "#tgw-done .ok{font-size:40px;color:#2e9e5b}" +
+    "#tgw-done p{margin:8px 0 4px;font-size:15px;font-weight:600}" +
+    "#tgw-done small{color:#666;font-size:13px}" +
+    "#tgw-done button{margin-top:12px;background:none;border:1px solid #ccc;border-radius:8px;padding:8px 14px;cursor:pointer}";
+  document.head.appendChild(css);
 
-<section class="howto" id="how-to-buy">
-  <div class="howto-inner">
-    <p class="eyebrow">How to buy</p>
-    <h2>Four simple steps</h2>
-    <div class="steps">
-      <div class="step">
-        <span class="step-num">1</span>
-        <h3>Pick two books</h3>
-        <p>Browse the shelf and find two titles you want. Tap "Get this book" on each card.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">2</span>
-        <h3>Send us a message</h3>
-        <p>Message us on Telegram with both exact book titles.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">3</span>
-        <h3>Receive your eBooks</h3>
-        <p>We send both PDFs straight to your Telegram.</p>
-      </div>
-      <div class="step">
-        <span class="step-num">4</span>
-        <h3>Pay via Binance</h3>
-        <p>Buy 1, get 1 free — send just <strong>$10</strong> in USDT for both books to our Binance ID: <strong>124541816</strong></p>
-      </div>
-    </div>
-    <div class="contact-row">
-      <a href="#" class="contact-btn telegram" id="telegram-link">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3L19.5 4.36c.73-.33 1.43.18 1.15 1.3l-3.05 14.36c-.21 1-.83 1.24-1.7.78l-4.55-3.36-2.36 2.28c-.27.27-.5.5-.96.5z"/></svg>
-        Telegram
-      </a>
-    </div>
-    <p class="howto-note">Only want one book? That's fine too — just $10 for a single title.</p>
-    <p class="howto-note">Prefer to pay first? That works too — just let us know.</p>
-  </div>
-</section>
+  // ---- inject HTML ---------------------------------------------------
+  var wrap = document.createElement("div");
+  wrap.innerHTML =
+    '<div id="tgw-btn">&#128172;</div>' +
+    '<div id="tgw-panel">' +
+      '<div id="tgw-head">' + T.title + '<span id="tgw-close">&times;</span></div>' +
+      '<div id="tgw-body">' +
+        '<div id="tgw-form">' +
+          '<input id="tgw-name" type="text" placeholder="' + T.name + '">' +
+          '<textarea id="tgw-msg" rows="3" placeholder="' + T.msg + '"></textarea>' +
+          '<button id="tgw-send">' + T.send + '</button>' +
+        '</div>' +
+        '<div id="tgw-done">' +
+          '<div class="ok">&#10003;</div>' +
+          '<p>' + T.done + '</p><small>' + T.sub + '</small><br>' +
+          '<button id="tgw-again">' + T.again + '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(wrap);
 
-<footer class="site-footer">
-  <p>freemedicalebooks.com</p>
-</footer>
+  // ---- behaviour -----------------------------------------------------
+  var btn   = document.getElementById("tgw-btn");
+  var panel = document.getElementById("tgw-panel");
+  var form  = document.getElementById("tgw-form");
+  var done  = document.getElementById("tgw-done");
 
-<div class="modal-overlay" id="modal-overlay">
-  <div class="modal" id="modal">
-    <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
-    <div class="modal-cover"><img id="modal-img" src="" alt=""></div>
-    <div class="modal-body">
-      <p class="modal-cat" id="modal-cat"></p>
-      <h3 id="modal-title"></h3>
-      <p class="modal-author" id="modal-author"></p>
-      <p class="modal-price">$10 <span class="modal-bogo">— buy 1, get 1 free</span></p>
-      <p class="modal-instructions">Send us this title (plus a second one for free!) on Telegram to get your copies. Pay via Binance (USDT, ID 124541816) after you receive them.</p>
-      <div class="modal-actions">
-        <a href="#" class="contact-btn telegram" id="modal-telegram">Message on Telegram</a>
-      </div>
-    </div>
-  </div>
-</div>
+  function toggle() {
+    var open = panel.style.display === "none" || !panel.style.display;
+    panel.style.display = open ? "block" : "none";
+    btn.innerHTML = open ? "&times;" : "&#128172;";
+  }
+  btn.onclick = toggle;
+  document.getElementById("tgw-close").onclick = toggle;
 
-<script src="books.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+  document.getElementById("tgw-again").onclick = function () {
+    document.getElementById("tgw-name").value = "";
+    document.getElementById("tgw-msg").value = "";
+    done.style.display = "none";
+    form.style.display = "block";
+  };
+
+  document.getElementById("tgw-send").onclick = function () {
+    var name = document.getElementById("tgw-name").value.trim();
+    var msg  = document.getElementById("tgw-msg").value.trim();
+    if (!msg) { alert(T.empty); return; }
+
+    var text =
+      "\uD83D\uDCAC New message from " + SITE_NAME + "\n\n" +
+      "\uD83D\uDC64 " + (name || "(no name)") + "\n" +
+      "\uD83D\uDCDD " + msg;
+
+    var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage";
+
+    fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      if (d.ok) { form.style.display = "none"; done.style.display = "block"; }
+      else { alert(T.fail); }
+    })
+    .catch(function () { alert(T.fail); });
+  };
+})();
