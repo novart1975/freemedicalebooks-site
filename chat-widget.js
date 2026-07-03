@@ -1,39 +1,35 @@
 /* ============================================================
    Simple Telegram Chat Widget  (one-way: user -> your Telegram)
    ------------------------------------------------------------
-   HOW TO USE:
-   1. Fill in BOT_TOKEN and CHAT_ID below.
-   2. Add this one line to your HTML pages (before </body>):
+   Already wired to the freemedicalebooks.com Telegram bot.
+   Add this line to your pages (before </body>):
         <script src="chat-widget.js"></script>
-   That's it. Works on GitHub Pages, no backend needed.
+   Works on GitHub Pages, no backend needed.
    ============================================================ */
 
 (function () {
-  // ---- YOUR SETTINGS -------------------------------------------------
-  // The token is base64-encoded so GitHub's secret scanner won't revoke it.
-  // Encode yours once (e.g. btoa("123456:ABC...")) and paste the result here.
-  var BOT_TOKEN_B64 = "PUT_YOUR_BASE64_ENCODED_BOT_TOKEN_HERE";
-  var CHAT_ID       = "PUT_YOUR_CHAT_ID_HERE";   // e.g. "123456789"
-  var SITE_NAME     = "Free Medical eBooks";     // shows in the Telegram message
-  var LANG          = "en";                       // "en" or "ar"
+  // ---- YOUR SETTINGS (same bot as the site) -------------------------
+  var TG_TOKEN  = "8965184177:AAFM9n86nDP_yOIAJOBHwTt5Ncvgh8ghzVQ";
+  var TG_CHAT   = "-5578337872";
+  var SITE_NAME = "Free Medical eBooks";   // shows in the Telegram message
+  var LANG      = "en";                     // "en" or "ar"
   // --------------------------------------------------------------------
 
-  var BOT_TOKEN = atob(BOT_TOKEN_B64);
   var isAr = LANG === "ar";
 
   var T = {
-    title:  isAr ? "تحدث معنا"        : "Chat with us",
-    name:   isAr ? "اسمك"             : "Your name",
-    msg:    isAr ? "اكتب رسالتك…"     : "Type your message…",
-    send:   isAr ? "إرسال"            : "Send",
-    done:   isAr ? "تم إرسال رسالتك!" : "Message sent!",
-    sub:    isAr ? "سنعود إليك قريباً." : "We'll get back to you soon.",
-    again:  isAr ? "إرسال رسالة أخرى" : "Send another",
+    title:  isAr ? "تحدث معنا"          : "Chat with us",
+    name:   isAr ? "اسمك"               : "Your name",
+    msg:    isAr ? "اكتب رسالتك…"       : "Type your message…",
+    send:   isAr ? "إرسال"              : "Send",
+    done:   isAr ? "تم إرسال رسالتك!"   : "Message sent!",
+    sub:    isAr ? "سنعود إليك قريباً."  : "We'll get back to you soon.",
+    again:  isAr ? "إرسال رسالة أخرى"   : "Send another",
     empty:  isAr ? "الرجاء كتابة رسالة." : "Please type a message.",
     fail:   isAr ? "تعذّر الإرسال، حاول مرة أخرى." : "Couldn't send, please try again."
   };
 
-  var ACCENT = "#1d7fd4";
+  var ACCENT = "#0b84ff";
   var dir = isAr ? "rtl" : "ltr";
   var side = isAr ? "left" : "right";
 
@@ -51,8 +47,7 @@
     "#tgw-done{display:none;text-align:center;padding:8px 0}" +
     "#tgw-done .ok{font-size:40px;color:#2e9e5b}" +
     "#tgw-done p{margin:8px 0 4px;font-size:15px;font-weight:600}" +
-    "#tgw-done small{color:#666;font-size:13px}" +
-    "#tgw-done button{margin-top:12px;background:none;border:1px solid #ccc;border-radius:8px;padding:8px 14px;cursor:pointer}";
+    "#tgw-done small{color:#666;font-size:13px}";
   document.head.appendChild(css);
 
   // ---- inject HTML ---------------------------------------------------
@@ -98,27 +93,28 @@
   };
 
   document.getElementById("tgw-send").onclick = function () {
+    var sendBtn = document.getElementById("tgw-send");
     var name = document.getElementById("tgw-name").value.trim();
     var msg  = document.getElementById("tgw-msg").value.trim();
     if (!msg) { alert(T.empty); return; }
+
+    sendBtn.disabled = true; sendBtn.textContent = "...";
 
     var text =
       "\uD83D\uDCAC New message from " + SITE_NAME + "\n\n" +
       "\uD83D\uDC64 " + (name || "(no name)") + "\n" +
       "\uD83D\uDCDD " + msg;
 
-    var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage";
-
-    fetch(url, {
+    fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+      body: JSON.stringify({ chat_id: TG_CHAT, text: text })
     })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       if (d.ok) { form.style.display = "none"; done.style.display = "block"; }
-      else { alert(T.fail); }
+      else { sendBtn.disabled = false; sendBtn.textContent = T.send; alert(T.fail); }
     })
-    .catch(function () { alert(T.fail); });
+    .catch(function () { sendBtn.disabled = false; sendBtn.textContent = T.send; alert(T.fail); });
   };
 })();
