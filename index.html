@@ -106,9 +106,7 @@
     .fme-tg-btn{display:flex;align-items:center;gap:14px;border:1.5px solid #229ED9;border-radius:12px;padding:18px 20px;text-decoration:none;color:#0f1b2d;font-family:'Inter',sans-serif;font-weight:700;letter-spacing:.5px;font-size:15px;transition:background .15s}
     .fme-tg-btn:hover{background:#eaf6fc}
     .fme-tg-btn svg{width:26px;height:26px;fill:#229ED9;flex-shrink:0}
-    .fme-email-box{border:1px solid #e6e9ee;border-radius:12px;padding:16px 20px;background:#fff}
-    .fme-email-box .lbl{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8a94a3;margin:0 0 4px}
-    .fme-email-box .val{font-family:'Inter',sans-serif;font-size:15px;color:#0b84ff;margin:0}
+    .fme-left-note{font-family:'Inter',sans-serif;font-size:13px;color:#667;line-height:1.6;margin:4px 2px 0}
     .fme-right{display:flex;flex-direction:column;gap:12px}
     .fme-right label{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#8a94a3;margin:0 0 2px;display:block}
     .fme-right input,.fme-right textarea{width:100%;box-sizing:border-box;border:none;border-bottom:1.5px solid #d8dee6;background:transparent;padding:10px 2px;font-size:15px;font-family:'Inter',sans-serif;color:#0f1b2d;outline:none;transition:border-color .15s}
@@ -129,15 +127,11 @@
 
     <div class="fme-grid">
       <div class="fme-left">
-        <!-- TODO: replace with your Telegram username link -->
-        <a class="fme-tg-btn" href="https://t.me/YOUR_TELEGRAM_USERNAME" target="_blank" rel="noopener">
+        <a class="fme-tg-btn" href="https://t.me/Abu0Salma" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3L19.5 4.36c.73-.33 1.43.18 1.15 1.3l-3.05 14.36c-.21 1-.83 1.24-1.7.78l-4.55-3.36-2.36 2.28c-.27.27-.5.5-.96.5z"/></svg>
           Chat on Telegram
         </a>
-        <div class="fme-email-box">
-          <p class="lbl">Email</p>
-          <p class="val">info@freemedicalebooks.com</p>
-        </div>
+        <p class="fme-left-note">Prefer chatting directly? Tap the button above to message us on Telegram, or use the form to send us your book request.</p>
       </div>
 
       <div class="fme-right" id="fme-form">
@@ -157,10 +151,9 @@
 
   <script>
   (function(){
-    // Uses the same Telegram bot as chat-widget.js.
-    var BOT_TOKEN_B64 = "PUT_YOUR_BASE64_ENCODED_BOT_TOKEN_HERE";
-    var CHAT_ID       = "PUT_YOUR_CHAT_ID_HERE";
-    var BOT_TOKEN = atob(BOT_TOKEN_B64);
+    // Same Telegram bot used across freemedicalebooks.com
+    var TG_TOKEN = "8965184177:AAFM9n86nDP_yOIAJOBHwTt5Ncvgh8ghzVQ";
+    var TG_CHAT  = "-5578337872";
 
     var btn = document.getElementById('fme-send');
     btn.addEventListener('click', function(){
@@ -176,10 +169,10 @@
                  "\u2709\uFE0F " + (email || "(no email)") + "\n" +
                  "\uD83D\uDCDD " + msg;
 
-      fetch("https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage", {
+      fetch("https://api.telegram.org/bot" + TG_TOKEN + "/sendMessage", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+        body: JSON.stringify({ chat_id: TG_CHAT, text: text })
       })
       .then(function(r){ return r.json(); })
       .then(function(d){
